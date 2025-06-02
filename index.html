@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
   <style>
-    /* Custom scrollbar */
+    /* Custom scrollbar for the order grid and sidebar */
     .scrollbar-thin::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -18,7 +18,7 @@
     }
 
     .scrollbar-thin::-webkit-scrollbar-thumb {
-      background-color: #d1d5db;
+      background-color: #cbd5e1;
       border-radius: 3px;
     }
 
@@ -27,117 +27,41 @@
         visibility: hidden;
       }
 
-      #printableReceipt,
-      #printableReceipt * {
+      #printArea,
+      #printArea * {
         visibility: visible;
       }
 
-      #printableReceipt {
+      #printArea {
         position: absolute;
         left: 0;
         top: 0;
-        width: 400px;
-        max-width: 100%;
-        background: #fff;
-        color: #000;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding: 25px 30px;
-        box-sizing: border-box;
-        border: 1px solid #e75a2f;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-        direction: rtl;
-        font-size: 14px;
-        line-height: 1.5;
-      }
-
-      #printableReceipt h2 {
-        margin-bottom: 15px;
-        font-size: 24px;
-        font-weight: 700;
-        color: #e75a2f;
-        text-align: center;
-        letter-spacing: 1.5px;
-      }
-
-      #printableReceipt .receipt-header {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 13px;
-        color: #555;
-        font-weight: 600;
-      }
-
-      #printableReceipt table {
         width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-
-      #printableReceipt thead tr {
-        border-bottom: 2px solid #e75a2f;
-      }
-
-      #printableReceipt thead th {
-        padding: 8px 6px;
-        font-weight: 700;
-        color: #130501;
-        text-align: center;
-        font-size: 13px;
-      }
-
-      #printableReceipt tbody tr {
-        border-bottom: 2px solid #070000;
-        border-top: 2px solid #070000;
-      }
-
-      #printableReceipt tbody td {
-        padding: 8px 6px;
-        font-size: 13px;
-        color: #333;
-        text-align: center;
-        border: 2px solid #e75;
-      }
-
-      #printableReceipt tbody td:first-child {
-        text-align: right;
-        font-weight: 600;
-        color: #000;
-      }
-
-      #printableReceipt .total-row td {
-        border-top: 2px solid #e75a2f;
-        font-weight: 700;
-        font-size: 16px;
-        color: #e75a2f;
-        padding-top: 12px;
-      }
-
-      #printableReceipt .footer-text {
-        text-align: center;
-        font-size: 12px;
-        color: #777;
-        margin-top: 25px;
-        font-style: italic;
-        letter-spacing: 0.5px;
+        padding: 1rem;
+        background: white;
+        font-family: Arial, sans-serif;
+        direction: rtl;
       }
     }
   </style>
 </head>
 
-<body class="bg-[#2f2f2f] font-sans min-h-screen flex flex-col">
+<body class="bg-[#2f2f2f] font-sans min-h-screen flex flex-col items-center p-4">
 
-  <div class="max-w-[1200px] mx-auto mt-8 mb-12 rounded-lg overflow-hidden shadow-lg bg-[#1a1a1a] flex flex-col md:flex-row min-h-[700px]">
+  <div class="max-w-[1200px] w-full flex flex-col md:flex-row gap-6">
 
-    <!-- Left Sidebar: Current Orders & Checkout -->
-    <section class="w-full md:w-1/3 flex flex-col bg-[#1a1a1a]">
-      <div class="bg-[#e75a2f] flex items-center justify-between px-4 py-3">
+    <!-- Left Sidebar: Current Orders and Checkout -->
+    <div class="w-full md:w-1/3 bg-[#1a1a1a] rounded-lg shadow-lg flex flex-col h-[700px]">
+
+      <div class="bg-[#e75a2f] flex items-center justify-between px-4 py-3 rounded-t-lg">
         <h1 class="text-white font-bold text-lg">طلباتك الحالية</h1>
-        <button aria-label="إغلاق الطلبات" class="text-white text-xl" id="clearCurrentOrderBtn" title="حذف الطلب الحالي بالكامل">
-          <i class="fas fa-trash-alt"></i>
+        <button aria-label="إغلاق" class="text-white text-xl" id="closeOrderSidebarBtn" title="إغلاق الطلبات الحالية">
+          <i class="fas fa-times"></i>
         </button>
       </div>
+
       <div id="orderList" class="flex-1 overflow-y-auto scrollbar-thin px-4 py-3 space-y-4"></div>
+
       <div class="bg-[#1a1a1a] border-t border-[#444] px-4 py-4">
         <label for="customerName" class="block text-white font-semibold mb-1">اسم العميل</label>
         <input id="customerName" type="text" placeholder="أدخل اسم العميل"
@@ -151,100 +75,112 @@
           disabled>إتمام عملية الدفع</button>
         <button id="openInvoicesPageBtn"
           class="mt-3 w-full bg-[#444] text-white font-semibold py-2 rounded hover:bg-[#666] transition flex items-center justify-center space-x-2 rtl:space-x-reverse">
-          <span>سجل الفواتير</span> <i class="fas fa-external-link-alt"></i>
+          <span>السجل</span> <i class="fas fa-external-link-alt"></i>
         </button>
         <button id="clearInvoicesBtn"
           class="mt-2 w-full bg-[#a22] text-white font-semibold py-2 rounded hover:bg-[#c33] transition flex items-center justify-center space-x-2 rtl:space-x-reverse">
-          <span>حذف سجل الفواتير</span> <i class="fas fa-trash-alt"></i>
+          <span>حذف السجل</span> <i class="fas fa-trash-alt"></i>
         </button>
       </div>
-    </section>
+    </div>
 
-    <!-- Right Content: Products & Orders Management -->
-    <section class="flex-1 flex flex-col bg-[#f9f9f9]">
+    <!-- Right Content: Orders Overview + Product Selection -->
+    <div class="flex-1 flex flex-col gap-6">
 
       <!-- Top: Oldest Order Display -->
-      <div class="bg-white p-4 border-b border-gray-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div class="flex items-center space-x-3 rtl:space-x-reverse">
-          <div id="orderStatusContainer" class="flex items-center space-x-2 rtl:space-x-reverse text-green-600 font-semibold text-sm"></div>
-          <div id="orderStatusText" class="font-semibold text-gray-700 text-sm"></div>
-          <div id="orderTable" class="font-bold text-gray-900 text-sm"></div>
-        </div>
-        <div class="flex items-center space-x-3 rtl:space-x-reverse text-xs text-gray-500">
-          <div id="orderTimeDate">--:-- --/--/--</div>
-          <div id="orderNumber" class="font-semibold">رقم الطلب: -</div>
-        </div>
-        <div id="orderItems" class="text-sm font-semibold text-gray-800 max-w-xs truncate">اسم الخدمة: -</div>
-        <div class="flex space-x-2 rtl:space-x-reverse">
-          <button aria-label="إخفاء الطلب الأقدم" title="إخفاء الطلب الأقدم" id="hideOldestOrderBtn"
-            class="bg-orange-600 hover:bg-orange-700 text-white rounded px-3 py-1 text-xs flex items-center justify-center">
-            <i class="fas fa-eye-slash"></i>
-          </button>
-          <button aria-label="طباعة الطلب الأقدم" title="طباعة الطلب الأقدم" id="printOldestOrderBtn"
-            class="bg-orange-600 hover:bg-orange-700 text-white rounded px-3 py-1 text-xs flex items-center justify-center">
-            <i class="fas fa-print"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Category Navigation -->
-      <nav id="categoryNav"
-        class="flex space-x-2 rtl:space-x-reverse overflow-x-auto text-xs border-b border-gray-300 px-4 py-2 bg-white">
-        <a href="#" data-category="favorites"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">اكلات شرقية</a>
-        <a href="#" data-category="kodrat"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">وجبات سريعة</a>
-        <a href="#" data-category="buffets"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">بيتزا</a>
-        <a href="#" data-category="drinks"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">المشروبات الباردة</a>
-        <a href="#" data-category="softdrinks"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">المشروبات الساخنة</a>
-        <a href="#" data-category="mainDishes"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">أطباق رئيسية</a>
-        <a href="#" data-category="snacks"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">وجبات خفيفة</a>
-        <a href="#" data-category="desserts"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">حلويات</a>
-        <a href="#" data-category="kidsMeals"
-          class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">سندوتشات</a>
-      </nav>
-
-      <!-- Search Bar -->
-      <div class="flex items-center justify-end px-4 py-2 border-b border-gray-300 bg-white">
-        <input id="searchInput"
-          class="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#e75a2f] max-w-xs"
-          placeholder="ابحث عن منتج" type="text" />
-        <button aria-label="بحث" class="text-gray-600 hover:text-[#e75a2f] ml-2 rtl:ml-0 rtl:mr-2" id="searchBtn"><i
-            class="fas fa-search"></i></button>
-      </div>
-
-      <!-- Products Grid -->
-      <div id="productsContainer"
-        class="flex flex-wrap p-4 gap-4 overflow-y-auto scrollbar-thin flex-1 min-h-0 bg-[#f9f9f9]"></div>
-
-      <!-- Orders Grid -->
-      <div class="bg-black rounded-b-lg p-4 max-h-[280px] overflow-y-auto scrollbar-thin">
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="text-white font-bold text-lg">قائمة الطلبات</h2>
+      <div
+        class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-300 p-4 flex flex-col space-y-2 max-w-full">
+        <div class="flex justify-between items-center mb-1">
+          <div class="flex items-center space-x-2 rtl:space-x-reverse" id="orderStatusContainer"></div>
+          <div class="text-xs text-gray-500" id="orderTimeDate">--:-- --/--/--</div>
           <div class="flex space-x-2 rtl:space-x-reverse">
-            <button id="openHistoryBtn"
-              class="bg-purple-600 hover:bg-purple-700 text-white rounded px-3 py-1 text-sm flex items-center space-x-2 rtl:space-x-reverse"
-              aria-label="فتح سجل الطلبات">
-              <i class="fas fa-history"></i>
-              <span>سجل الطلبات</span>
+            <button aria-label="إخفاء" title="إخفاء الطلب الأقدم"
+              class="bg-orange-600 hover:bg-orange-700 text-white rounded px-2 py-1 text-xs flex items-center justify-center"
+              onclick="hideOldestOrder()">
+              <i class="fas fa-eye-slash"></i>
             </button>
-            <button id="addTableBtn"
-              class="bg-green-600 hover:bg-green-700 text-white rounded px-3 py-1 text-sm flex items-center space-x-2 rtl:space-x-reverse"
-              aria-label="إضافة طلب ترابيزة جديدة">
-              <i class="fas fa-plus"></i>
-              <span>إضافة طلب ترابيزة جديدة</span>
+            <button aria-label="طباعة" title="طباعة الطلب الأقدم"
+              class="bg-orange-600 hover:bg-orange-700 text-white rounded px-2 py-1 text-xs flex items-center justify-center"
+              onclick="printOldestOrder()">
+              <i class="fas fa-print"></i>
             </button>
           </div>
         </div>
-        <div id="ordersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+        <div class="text-xs text-gray-600 font-semibold mb-0.5" id="orderStatusText">ASAP</div>
+        <div class="text-sm font-bold text-gray-900 mb-0.5" id="orderTable">Table#?</div>
+        <div class="text-sm font-semibold text-gray-800 mb-0.5" id="orderItems">اسم الخدمة: -</div>
+        <div class="text-xs text-gray-600 font-semibold mb-0.5" id="orderNumber">رقم الطلب: -</div>
+        <div class="text-xs text-gray-500">Terminal</div>
       </div>
-    </section>
+
+      <!-- Orders Grid and Product Selection Tabs -->
+      <div class="flex flex-col md:flex-row gap-6 flex-1 min-h-0">
+
+        <!-- Orders Grid -->
+        <div class="bg-black rounded-lg shadow-lg p-4 flex flex-col w-full md:w-1/2 min-h-0">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-white font-bold text-lg">قائمة الطلبات</h2>
+            <div class="flex space-x-2 rtl:space-x-reverse">
+              <button id="openHistoryBtn"
+                class="bg-purple-600 hover:bg-purple-700 text-white rounded px-3 py-1 text-sm flex items-center space-x-2 rtl:space-x-reverse"
+                aria-label="فتح سجل الطلبات" onclick="openHistoryModal()">
+                <i class="fas fa-history"></i>
+                <span>سجل الطلبات</span>
+              </button>
+              <button id="addTableBtn"
+                class="bg-green-600 hover:bg-green-700 text-white rounded px-3 py-1 text-sm flex items-center space-x-2 rtl:space-x-reverse"
+                onclick="openAddOrderModal()" aria-label="إضافة طلب ترابيزة جديدة">
+                <i class="fas fa-plus"></i>
+                <span>إضافة طلب ترابيزة جديدة</span>
+              </button>
+            </div>
+          </div>
+          <div id="ordersGrid"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 scrollbar-thin overflow-y-auto flex-1 min-h-0"></div>
+        </div>
+
+        <!-- Product Selection -->
+        <div class="flex flex-col w-full md:w-1/2 bg-[#f9f9f9] rounded-lg shadow-lg min-h-0">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gray-300">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+              <i class="fas fa-utensils text-[#e75a2f] text-xl"></i>
+              <h2 class="text-[#e75a2f] font-bold text-lg">الأحلام</h2>
+            </div>
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+              <input id="searchInput"
+                class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#e75a2f]"
+                placeholder="ابحث عن منتج" type="text" />
+              <button aria-label="بحث" class="text-gray-600 hover:text-[#e75a2f]" id="searchBtn"><i
+                  class="fas fa-search"></i></button>
+            </div>
+          </div>
+          <nav id="categoryNav"
+            class="flex space-x-2 rtl:space-x-reverse overflow-x-auto text-xs border-b border-gray-300 px-4 py-1 bg-white">
+            <a href="#" data-category="favorites"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">اكلات شرقية </a>
+            <a href="#" data-category="kodrat"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">وجبات سريعة</a>
+            <a href="#" data-category="buffets"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">بيتزا</a>
+            <a href="#" data-category="drinks"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">المشروبات الباردة</a>
+            <a href="#" data-category="softdrinks"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">المشروبات الساخنة</a>
+            <a href="#" data-category="mainDishes"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">أطباق رئيسية</a>
+            <a href="#" data-category="snacks"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">وجبات خفيفة</a>
+            <a href="#" data-category="desserts"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">حلويات</a>
+            <a href="#" data-category="kidsMeals"
+              class="whitespace-nowrap text-gray-600 hover:text-[#e75a2f] font-semibold">سندوتشات</a>
+          </nav>
+          <div id="productsContainer" class="flex flex-wrap p-4 gap-4 overflow-y-auto scrollbar-thin flex-1 min-h-0"
+            style="background-color:#f9f9f9;"></div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- Hidden printable receipt container -->
@@ -358,7 +294,7 @@
   <div id="printArea" class="hidden"></div>
 
   <script>
-    // ================== PRODUCTS DATA ===================
+    // ================== Products Data and Order Sidebar Logic ==================
     const productsData = {
       favorites: [
         {
@@ -1136,7 +1072,6 @@
       ]
     };
 
-    // ================== VARIABLES ===================
     const productsContainer = document.getElementById('productsContainer');
     const orderList = document.getElementById('orderList');
     const totalPriceEl = document.getElementById('totalPrice');
@@ -1147,7 +1082,7 @@
     const searchBtn = document.getElementById('searchBtn');
     const customerNameInput = document.getElementById('customerName');
     const openInvoicesPageBtn = document.getElementById('openInvoicesPageBtn');
-    const clearCurrentOrderBtn = document.getElementById('clearCurrentOrderBtn');
+    const closeOrderSidebarBtn = document.getElementById('closeOrderSidebarBtn');
 
     // Receipt elements
     const printableReceipt = document.getElementById('printableReceipt');
@@ -1162,36 +1097,403 @@
     const closeInvoicesPageBtn = document.getElementById('closeInvoicesPageBtn');
     const clearInvoicesPageBtn = document.getElementById('clearInvoicesPageBtn');
 
-    // Oldest order display elements
-    const orderStatusContainer = document.getElementById('orderStatusContainer');
+    // Store order items as an object with productId keys
+    const orderItems = {};
+
+    // Load invoices from localStorage or initialize empty array
+    let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
+    // Render products for a given category and optional search term
+    function renderProducts(category, searchTerm = '') {
+      productsContainer.innerHTML = '';
+      let products = productsData[category] || [];
+      if (searchTerm.trim() !== '') {
+        const term = searchTerm.trim().toLowerCase();
+        products = products.filter(p => p.name.toLowerCase().includes(term));
+      }
+      if (products.length === 0) {
+        const p = document.createElement('p');
+        p.className = 'text-gray-500 text-center w-full';
+        p.textContent = 'لا توجد منتجات مطابقة للبحث.';
+        productsContainer.appendChild(p);
+        return;
+      }
+      products.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'cursor-pointer w-1/2 sm:w-1/3 md:w-1/4 bg-white rounded shadow p-2 flex flex-col items-center text-center hover:ring-2 hover:ring-[#e75a2f] transition';
+        div.dataset.id = product.id;
+        div.dataset.name = product.name;
+        div.dataset.price = product.price;
+
+        const img = document.createElement('img');
+        img.src = product.img;
+        img.alt = product.alt;
+        img.className = 'mb-2 rounded';
+        img.width = 80;
+        img.height = 80;
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'text-xs text-gray-700 font-semibold';
+        nameDiv.textContent = product.name;
+
+        div.appendChild(img);
+        div.appendChild(nameDiv);
+
+        div.addEventListener('click', () => {
+          const id = div.dataset.id;
+          const name = div.dataset.name;
+          const price = parseFloat(div.dataset.price);
+          const imgSrc = img.src;
+
+          if (orderItems[id]) {
+            orderItems[id].quantity++;
+          } else {
+            orderItems[id] = { id, name, price, quantity: 1, img: imgSrc };
+          }
+          updateOrderList();
+          updateTotal();
+          if (orderSidebarHidden) {
+            toggleOrderSidebar(true);
+          }
+        });
+
+        productsContainer.appendChild(div);
+      });
+    }
+
+    function createOrderItemElement(item) {
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between';
+      div.dataset.id = item.id;
+
+      const leftDiv = document.createElement('div');
+      leftDiv.className = 'flex items-center space-x-3 rtl:space-x-reverse';
+
+      const img = document.createElement('img');
+      img.src = item.img;
+      img.alt = item.name + ' - صورة';
+      img.width = 40;
+      img.height = 40;
+      img.className = 'rounded';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'text-white text-sm font-semibold';
+      nameDiv.textContent = item.name;
+
+      leftDiv.appendChild(img);
+      leftDiv.appendChild(nameDiv);
+
+      const qtyDiv = document.createElement('div');
+      qtyDiv.className = 'text-white text-sm flex items-center space-x-1 rtl:space-x-reverse';
+
+      const minusBtn = document.createElement('button');
+      minusBtn.className = 'text-white text-lg font-bold px-1';
+      minusBtn.textContent = '-';
+      minusBtn.title = 'إنقاص الكمية';
+      minusBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (orderItems[item.id].quantity > 1) {
+          orderItems[item.id].quantity--;
+        } else {
+          delete orderItems[item.id];
+          div.remove();
+        }
+        updateOrderList();
+        updateTotal();
+      });
+
+      const qtySpan = document.createElement('span');
+      qtySpan.textContent = item.quantity;
+
+      const plusBtn = document.createElement('button');
+      plusBtn.className = 'text-white text-lg font-bold px-1';
+      plusBtn.textContent = '+';
+      plusBtn.title = 'زيادة الكمية';
+      plusBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        orderItems[item.id].quantity++;
+        updateOrderList();
+        updateTotal();
+      });
+
+      qtyDiv.appendChild(minusBtn);
+      qtyDiv.appendChild(qtySpan);
+      qtyDiv.appendChild(plusBtn);
+
+      div.appendChild(leftDiv);
+      div.appendChild(qtyDiv);
+
+      return div;
+    }
+
+    function updateOrderList() {
+      orderList.innerHTML = '';
+      for (const id in orderItems) {
+        const item = orderItems[id];
+        const el = createOrderItemElement(item);
+        orderList.appendChild(el);
+      }
+    }
+
+    function updateTotal() {
+      let total = 0;
+      for (const id in orderItems) {
+        total += orderItems[id].price * orderItems[id].quantity;
+      }
+      totalPriceEl.textContent = total.toFixed(2) + ' ر.س';
+      checkoutBtn.disabled = total === 0 || customerNameInput.value.trim() === '';
+    }
+
+    function printReceipt(invoice) {
+      // Clear previous receipt items
+      receiptItems.innerHTML = '';
+
+      // Set date
+      const date = new Date(invoice.date);
+      receiptDate.textContent = date.toLocaleString('ar-EG', { dateStyle: 'full', timeStyle: 'short' });
+
+      // Set customer name
+      receiptCustomer.textContent = invoice.customerName ? `اسم العميل: ${invoice.customerName}` : '';
+
+      // Add items rows
+      invoice.items.forEach(item => {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.textContent = item.name;
+
+        const tdQty = document.createElement('td');
+        tdQty.textContent = item.quantity;
+
+        const tdPrice = document.createElement('td');
+        tdPrice.textContent = (item.price * item.quantity).toFixed(2);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdQty);
+        tr.appendChild(tdPrice);
+
+        receiptItems.appendChild(tr);
+      });
+
+      receiptTotal.textContent = invoice.total.toFixed(2);
+
+      // Show receipt container
+      printableReceipt.classList.remove('hidden');
+
+      // Trigger print
+      window.print();
+
+      // Hide receipt container after print
+      printableReceipt.classList.add('hidden');
+    }
+
+    // Render invoices inside the modal page
+    function renderInvoicesPage() {
+      invoicesPageList.innerHTML = '';
+      if (invoices.length === 0) {
+        const p = document.createElement('p');
+        p.className = 'text-gray-400 text-center';
+        p.textContent = 'لا توجد فواتير حتى الآن.';
+        invoicesPageList.appendChild(p);
+        return;
+      }
+      invoices.slice().reverse().forEach((invoice, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-[#333] p-4 rounded shadow cursor-pointer hover:bg-[#444] transition flex flex-col space-y-2';
+
+        const date = new Date(invoice.date);
+        const dateStr = date.toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+
+        const header = document.createElement('div');
+        header.className = 'font-semibold text-[#e75a2f] flex justify-between text-lg';
+        header.innerHTML = `<span>فاتورة #${invoices.length - index}</span><span>${dateStr}</span>`;
+        div.appendChild(header);
+
+        if (invoice.customerName) {
+          const customerDiv = document.createElement('div');
+          customerDiv.className = 'text-white font-semibold';
+          customerDiv.textContent = `اسم العميل: ${invoice.customerName}`;
+          div.appendChild(customerDiv);
+        }
+
+        invoice.items.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'flex justify-between text-white text-sm';
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = `${item.name} x${item.quantity}`;
+          const priceSpan = document.createElement('span');
+          priceSpan.textContent = (item.price * item.quantity).toFixed(2) + ' ر.س';
+          itemDiv.appendChild(nameSpan);
+          itemDiv.appendChild(priceSpan);
+          div.appendChild(itemDiv);
+        });
+
+        const totalDiv = document.createElement('div');
+        totalDiv.className = 'flex justify-between font-bold text-white border-t border-[#555] pt-2 mt-2 text-base';
+        totalDiv.innerHTML = `<span>المجموع</span><span>${invoice.total.toFixed(2)} ر.س</span>`;
+        div.appendChild(totalDiv);
+
+        // On click, print this invoice
+        div.addEventListener('click', () => {
+          printReceipt(invoice);
+        });
+
+        invoicesPageList.appendChild(div);
+      });
+    }
+
+    checkoutBtn.addEventListener('click', () => {
+      if (checkoutBtn.disabled) return;
+      const customerName = customerNameInput.value.trim();
+      if (!customerName) {
+        alert('يرجى إدخال اسم العميل قبل إتمام عملية الدفع.');
+        customerNameInput.focus();
+        return;
+      }
+      const itemsArray = [];
+      for (const id in orderItems) {
+        const item = orderItems[id];
+        itemsArray.push({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        });
+      }
+      let total = 0;
+      itemsArray.forEach(i => total += i.price * i.quantity);
+      total = parseFloat(total);
+
+      // Create invoice object
+      const invoice = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        items: itemsArray,
+        total: total,
+        customerName: customerName
+      };
+
+      // Save invoice to localStorage
+      invoices.push(invoice);
+      localStorage.setItem('invoices', JSON.stringify(invoices));
+
+      // Print receipt
+      printReceipt(invoice);
+
+      // Clear order after checkout
+      for (const id in orderItems) {
+        delete orderItems[id];
+      }
+      updateOrderList();
+      updateTotal();
+      customerNameInput.value = '';
+    });
+
+    clearInvoicesBtn.addEventListener('click', () => {
+      if (confirm('هل أنت متأكد من حذف جميع الفواتير؟ لا يمكن التراجع عن هذا الإجراء.')) {
+        invoices = [];
+        localStorage.removeItem('invoices');
+        renderInvoicesPage();
+      }
+    });
+
+    // Open invoices page modal
+    openInvoicesPageBtn.addEventListener('click', () => {
+      renderInvoicesPage();
+      invoicesPageModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+
+    // Close invoices page modal
+    closeInvoicesPageBtn.addEventListener('click', () => {
+      invoicesPageModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+
+    // Clear invoices from modal button
+    clearInvoicesPageBtn.addEventListener('click', () => {
+      if (confirm('هل أنت متأكد من حذف جميع الفواتير؟ لا يمكن التراجع عن هذا الإجراء.')) {
+        invoices = [];
+        localStorage.removeItem('invoices');
+        renderInvoicesPage();
+      }
+    });
+
+    // Category navigation click handler
+    categoryNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        // Remove active styles from all
+        categoryNav.querySelectorAll('a').forEach(a => a.classList.remove('text-[#e75a2f]', 'font-bold'));
+        // Add active style to clicked
+        link.classList.add('text-[#e75a2f]', 'font-bold');
+        // Render products for selected category
+        const category = link.dataset.category;
+        renderProducts(category, searchInput.value);
+      });
+    });
+
+    // Search function
+    function performSearch() {
+      const activeLink = categoryNav.querySelector('a.text-[#e75a2f]');
+      const category = activeLink ? activeLink.dataset.category : 'favorites';
+      renderProducts(category, searchInput.value);
+    }
+
+    searchBtn.addEventListener('click', () => {
+      performSearch();
+    });
+
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+
+    // Enable/disable checkout button based on customer name and order items
+    customerNameInput.addEventListener('input', () => {
+      updateTotal();
+    });
+
+    // Initialize default category (المفضلة)
+    const defaultCategoryLink = categoryNav.querySelector('a[data-category="favorites"]');
+    if (defaultCategoryLink) {
+      defaultCategoryLink.classList.add('text-[#e75a2f]', 'font-bold');
+      renderProducts('favorites');
+    }
+
+    // Toggle order sidebar visibility
+    let orderSidebarHidden = false;
+    closeOrderSidebarBtn.addEventListener('click', () => {
+      toggleOrderSidebar(false);
+    });
+
+    function toggleOrderSidebar(show) {
+      const sidebar = closeOrderSidebarBtn.closest('div.w-full.md\\:w-1\\/3');
+      if (!sidebar) return;
+      if (show) {
+        sidebar.classList.remove('hidden');
+        orderSidebarHidden = false;
+      } else {
+        sidebar.classList.add('hidden');
+        orderSidebarHidden = true;
+      }
+    }
+
+    // ================== Orders Management ==================
+    const ordersGrid = document.getElementById('ordersGrid');
     const orderStatusEl = document.getElementById('orderStatusText');
     const orderTableEl = document.getElementById('orderTable');
+    const orderStatusContainer = document.getElementById('orderStatusContainer');
     const orderTimeDate = document.getElementById('orderTimeDate');
     const orderNumberEl = document.getElementById('orderNumber');
     const orderItemsEl = document.getElementById('orderItems');
-    const hideOldestOrderBtn = document.getElementById('hideOldestOrderBtn');
-    const printOldestOrderBtn = document.getElementById('printOldestOrderBtn');
-
-    // Orders grid and modals
-    const ordersGrid = document.getElementById('ordersGrid');
-    const historyModal = document.getElementById('historyModal');
-    const historyContent = document.getElementById('historyContent');
-    const openHistoryBtn = document.getElementById('openHistoryBtn');
-    const addTableBtn = document.getElementById('addTableBtn');
-    const addOrderModal = document.getElementById('addOrderModal');
-    const addOrderForm = document.getElementById('addOrderForm');
     const itemsContainer = document.getElementById('itemsContainer');
     const addItemBtn = document.getElementById('addItemBtn');
     const printArea = document.getElementById('printArea');
+    const historyModal = document.getElementById('historyModal');
+    const historyContent = document.getElementById('historyContent');
 
-    // ================== STATE ===================
-    // Current order items keyed by product id
-    const orderItems = {};
-
-    // Invoices loaded from localStorage or empty
-    let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
-
-    // Orders loaded from localStorage or default sample
     let orders = [];
     const savedOrders = localStorage.getItem('ordersData');
     if (savedOrders) {
@@ -1244,393 +1546,27 @@
       ];
     }
 
-    // Set of hidden order IDs (for hiding oldest order and others)
-    const hiddenIds = new Set();
-
-    // ================== FUNCTIONS ===================
-
-    // Save invoices to localStorage
-    function saveInvoices() {
-      localStorage.setItem('invoices', JSON.stringify(invoices));
-    }
-
-    // Save orders to localStorage
     function saveOrders() {
       localStorage.setItem('ordersData', JSON.stringify(orders));
     }
 
-    // Sort orders by id ascending
     function sortOrdersById() {
       orders.sort((a, b) => a.id - b.id);
     }
 
-    // Render products for a given category and optional search term
-    function renderProducts(category, searchTerm = '') {
-      productsContainer.innerHTML = '';
-      let products = productsData[category] || [];
-      if (searchTerm.trim() !== '') {
-        const term = searchTerm.trim().toLowerCase();
-        products = products.filter(p => p.name.toLowerCase().includes(term));
-      }
-      if (products.length === 0) {
-        const p = document.createElement('p');
-        p.className = 'text-gray-500 text-center w-full';
-        p.textContent = 'لا توجد منتجات مطابقة للبحث.';
-        productsContainer.appendChild(p);
-        return;
-      }
-      products.forEach(product => {
-        const div = document.createElement('div');
-        div.className = 'cursor-pointer w-1/2 sm:w-1/3 md:w-1/5 bg-white rounded shadow p-2 flex flex-col items-center text-center hover:ring-2 hover:ring-[#e75a2f] transition';
-        div.dataset.id = product.id;
-        div.dataset.name = product.name;
-        div.dataset.price = product.price;
+    // Set to store hidden order IDs (hidden from display but not deleted)
+    const hiddenIds = new Set();
 
-        const img = document.createElement('img');
-        img.src = product.img;
-        img.alt = product.alt;
-        img.className = 'mb-2 rounded';
-        img.width = 80;
-        img.height = 80;
-
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'text-xs text-gray-700 font-semibold truncate';
-        nameDiv.textContent = product.name;
-
-        div.appendChild(img);
-        div.appendChild(nameDiv);
-
-        div.addEventListener('click', () => {
-          const id = div.dataset.id;
-          const name = div.dataset.name;
-          const price = parseFloat(div.dataset.price);
-          const imgSrc = img.src;
-
-          if (orderItems[id]) {
-            orderItems[id].quantity++;
-          } else {
-            orderItems[id] = { id, name, price, quantity: 1, img: imgSrc };
-          }
-          updateOrderList();
-          updateTotal();
-        });
-
-        productsContainer.appendChild(div);
-      });
-    }
-
-    // Create order item element for sidebar
-    function createOrderItemElement(item) {
-      const div = document.createElement('div');
-      div.className = 'flex items-center justify-between';
-      div.dataset.id = item.id;
-
-      const leftDiv = document.createElement('div');
-      leftDiv.className = 'flex items-center space-x-3 rtl:space-x-reverse';
-
-      const img = document.createElement('img');
-      img.src = item.img;
-      img.alt = item.name + ' - صورة';
-      img.width = 40;
-      img.height = 40;
-      img.className = 'rounded';
-
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'text-white text-sm font-semibold truncate max-w-[120px]';
-      nameDiv.textContent = item.name;
-
-      leftDiv.appendChild(img);
-      leftDiv.appendChild(nameDiv);
-
-      const qtyDiv = document.createElement('div');
-      qtyDiv.className = 'text-white text-sm flex items-center space-x-1 rtl:space-x-reverse';
-
-      const minusBtn = document.createElement('button');
-      minusBtn.className = 'text-white text-lg font-bold px-1';
-      minusBtn.textContent = '-';
-      minusBtn.title = 'إنقاص الكمية';
-      minusBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (orderItems[item.id].quantity > 1) {
-          orderItems[item.id].quantity--;
-        } else {
-          delete orderItems[item.id];
-          div.remove();
-        }
-        updateOrderList();
-        updateTotal();
-      });
-
-      const qtySpan = document.createElement('span');
-      qtySpan.textContent = item.quantity;
-
-      const plusBtn = document.createElement('button');
-      plusBtn.className = 'text-white text-lg font-bold px-1';
-      plusBtn.textContent = '+';
-      plusBtn.title = 'زيادة الكمية';
-      plusBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        orderItems[item.id].quantity++;
-        updateOrderList();
-        updateTotal();
-      });
-
-      qtyDiv.appendChild(minusBtn);
-      qtyDiv.appendChild(qtySpan);
-      qtyDiv.appendChild(plusBtn);
-
-      div.appendChild(leftDiv);
-      div.appendChild(qtyDiv);
-
-      return div;
-    }
-
-    // Update order list sidebar
-    function updateOrderList() {
-      orderList.innerHTML = '';
-      for (const id in orderItems) {
-        const item = orderItems[id];
-        const el = createOrderItemElement(item);
-        orderList.appendChild(el);
-      }
-    }
-
-    // Update total price and checkout button state
-    function updateTotal() {
-      let total = 0;
-      for (const id in orderItems) {
-        total += orderItems[id].price * orderItems[id].quantity;
-      }
-      totalPriceEl.textContent = total.toFixed(2) + ' ر.س';
-      checkoutBtn.disabled = total === 0 || customerNameInput.value.trim() === '';
-    }
-
-    // Clear current order items
-    function clearCurrentOrder() {
-      for (const id in orderItems) {
-        delete orderItems[id];
-      }
-      updateOrderList();
-      updateTotal();
-      customerNameInput.value = '';
-    }
-
-    // Print receipt for invoice
-    function printReceipt(invoice) {
-      receiptItems.innerHTML = '';
-      const date = new Date(invoice.date);
-      receiptDate.textContent = date.toLocaleString('ar-EG', { dateStyle: 'full', timeStyle: 'short' });
-      receiptCustomer.textContent = invoice.customerName ? `اسم العميل: ${invoice.customerName}` : '';
-      invoice.items.forEach(item => {
-        const tr = document.createElement('tr');
-        const tdName = document.createElement('td');
-        tdName.textContent = item.name;
-        const tdQty = document.createElement('td');
-        tdQty.textContent = item.quantity;
-        const tdPrice = document.createElement('td');
-        tdPrice.textContent = (item.price * item.quantity).toFixed(2);
-        tr.appendChild(tdName);
-        tr.appendChild(tdQty);
-        tr.appendChild(tdPrice);
-        receiptItems.appendChild(tr);
-      });
-      receiptTotal.textContent = invoice.total.toFixed(2);
-      printableReceipt.classList.remove('hidden');
-      window.print();
-      printableReceipt.classList.add('hidden');
-    }
-
-    // Render invoices inside the modal page
-    function renderInvoicesPage() {
-      invoicesPageList.innerHTML = '';
-      if (invoices.length === 0) {
-        const p = document.createElement('p');
-        p.className = 'text-gray-400 text-center';
-        p.textContent = 'لا توجد فواتير حتى الآن.';
-        invoicesPageList.appendChild(p);
-        return;
-      }
-      invoices.slice().reverse().forEach((invoice, index) => {
-        const div = document.createElement('div');
-        div.className = 'bg-[#333] p-4 rounded shadow cursor-pointer hover:bg-[#444] transition flex flex-col space-y-2';
-
-        const date = new Date(invoice.date);
-        const dateStr = date.toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
-
-        const header = document.createElement('div');
-        header.className = 'font-semibold text-[#e75a2f] flex justify-between text-lg';
-        header.innerHTML = `<span>فاتورة #${invoices.length - index}</span><span>${dateStr}</span>`;
-        div.appendChild(header);
-
-        if (invoice.customerName) {
-          const customerDiv = document.createElement('div');
-          customerDiv.className = 'text-white font-semibold';
-          customerDiv.textContent = `اسم العميل: ${invoice.customerName}`;
-          div.appendChild(customerDiv);
-        }
-
-        invoice.items.forEach(item => {
-          const itemDiv = document.createElement('div');
-          itemDiv.className = 'flex justify-between text-white text-sm';
-          const nameSpan = document.createElement('span');
-          nameSpan.textContent = `${item.name} x${item.quantity}`;
-          const priceSpan = document.createElement('span');
-          priceSpan.textContent = (item.price * item.quantity).toFixed(2) + ' ر.س';
-          itemDiv.appendChild(nameSpan);
-          itemDiv.appendChild(priceSpan);
-          div.appendChild(itemDiv);
-        });
-
-        const totalDiv = document.createElement('div');
-        totalDiv.className = 'flex justify-between font-bold text-white border-t border-[#555] pt-2 mt-2 text-base';
-        totalDiv.innerHTML = `<span>المجموع</span><span>${invoice.total.toFixed(2)} ر.س</span>`;
-        div.appendChild(totalDiv);
-
-        div.addEventListener('click', () => {
-          printReceipt(invoice);
-        });
-
-        invoicesPageList.appendChild(div);
-      });
-    }
-
-    // ================== CHECKOUT ===================
-    checkoutBtn.addEventListener('click', () => {
-      if (checkoutBtn.disabled) return;
-      const customerName = customerNameInput.value.trim();
-      if (!customerName) {
-        alert('يرجى إدخال اسم العميل قبل إتمام عملية الدفع.');
-        customerNameInput.focus();
-        return;
-      }
-      const itemsArray = [];
-      for (const id in orderItems) {
-        const item = orderItems[id];
-        itemsArray.push({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity
-        });
-      }
-      let total = 0;
-      itemsArray.forEach(i => total += i.price * i.quantity);
-
-      // Create invoice object
-      const invoice = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        items: itemsArray,
-        total: total,
-        customerName: customerName
-      };
-
-      // Save invoice to localStorage
-      invoices.push(invoice);
-      saveInvoices();
-
-      // Print receipt
-      printReceipt(invoice);
-
-      // Clear order after checkout
-      clearCurrentOrder();
-    });
-
-    clearCurrentOrderBtn.addEventListener('click', () => {
-      if (Object.keys(orderItems).length === 0) return;
-      if (confirm('هل أنت متأكد من حذف الطلب الحالي بالكامل؟')) {
-        clearCurrentOrder();
-      }
-    });
-
-    clearInvoicesBtn.addEventListener('click', () => {
-      if (confirm('هل أنت متأكد من حذف جميع الفواتير؟ لا يمكن التراجع عن هذا الإجراء.')) {
-        invoices = [];
-        localStorage.removeItem('invoices');
-        renderInvoicesPage();
-      }
-    });
-
-    // Open invoices page modal
-    openInvoicesPageBtn.addEventListener('click', () => {
-      renderInvoicesPage();
-      invoicesPageModal.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    });
-
-    // Close invoices page modal
-    closeInvoicesPageBtn.addEventListener('click', () => {
-      invoicesPageModal.classList.add('hidden');
-      document.body.style.overflow = '';
-    });
-
-    // Clear invoices from modal button
-    clearInvoicesPageBtn.addEventListener('click', () => {
-      if (confirm('هل أنت متأكد من حذف جميع الفواتير؟ لا يمكن التراجع عن هذا الإجراء.')) {
-        invoices = [];
-        localStorage.removeItem('invoices');
-        renderInvoicesPage();
-      }
-    });
-
-    // ================== CATEGORY NAVIGATION ===================
-    categoryNav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        categoryNav.querySelectorAll('a').forEach(a => a.classList.remove('text-[#e75a2f]', 'font-bold'));
-        link.classList.add('text-[#e75a2f]', 'font-bold');
-        const category = link.dataset.category;
-        renderProducts(category, searchInput.value);
-      });
-    });
-
-    // Search function
-    function performSearch() {
-      const activeLink = categoryNav.querySelector('a.text-[#e75a2f]');
-      const category = activeLink ? activeLink.dataset.category : 'favorites';
-      renderProducts(category, searchInput.value);
-    }
-
-    searchBtn.addEventListener('click', () => {
-      performSearch();
-    });
-
-    searchInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        performSearch();
-      }
-    });
-
-    // Enable/disable checkout button based on customer name and order items
-    customerNameInput.addEventListener('input', () => {
-      updateTotal();
-    });
-
-    // Initialize default category (المفضلة)
-    const defaultCategoryLink = categoryNav.querySelector('a[data-category="favorites"]');
-    if (defaultCategoryLink) {
-      defaultCategoryLink.classList.add('text-[#e75a2f]', 'font-bold');
-      renderProducts('favorites');
-    }
-
-    // ================== ORDERS MANAGEMENT ===================
-
-    // Sort orders by id ascending
-    function sortOrders() {
-      orders.sort((a, b) => a.id - b.id);
-    }
-
-    // Get oldest visible order (not hidden)
     function getOldestOrder() {
       if (orders.length === 0) return null;
-      sortOrders();
+      sortOrdersById();
+      // Return first order not hidden
       for (const order of orders) {
         if (!hiddenIds.has(order.id)) return order;
       }
       return null;
     }
 
-    // Format date/time for display
     function formatDateTime(date) {
       const d = new Date(date);
       const hours = d.getHours().toString().padStart(2, '0');
@@ -1641,7 +1577,90 @@
       return `${hours}:${minutes} ${day}/${month}/${year}`;
     }
 
-    // Render oldest order display
+    function createOrderCard(order, index) {
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-md p-3 flex flex-col space-y-2';
+
+      const header = document.createElement('div');
+      header.className = 'flex justify-between items-center text-xs font-semibold text-gray-600';
+
+      const statusDiv = document.createElement('div');
+      statusDiv.textContent = order.status;
+
+      const tableDiv = document.createElement('div');
+      tableDiv.textContent = order.table;
+
+      const buttonsDiv = document.createElement('div');
+      buttonsDiv.className = 'flex space-x-1 rtl:space-x-reverse';
+
+      const hideBtn = document.createElement('button');
+      hideBtn.setAttribute('aria-label', 'إخفاء');
+      hideBtn.className = 'bg-orange-600 text-white rounded px-1.5 py-0.5';
+      hideBtn.innerHTML = '<i class="fas fa-eye-slash text-xs"></i>';
+      hideBtn.title = 'إخفاء الطلب';
+      hideBtn.onclick = () => {
+        hiddenIds.add(order.id);
+        renderOrders();
+        renderOldestOrder();
+        renderHistory();
+      };
+
+      const printBtn = document.createElement('button');
+      printBtn.setAttribute('aria-label', 'طباعة');
+      printBtn.className = 'bg-orange-600 text-white rounded px-1.5 py-0.5';
+      printBtn.innerHTML = '<i class="fas fa-print text-xs"></i>';
+      printBtn.title = 'طباعة الطلب';
+      printBtn.onclick = () => {
+        printOrder(order);
+      };
+
+      buttonsDiv.appendChild(hideBtn);
+      buttonsDiv.appendChild(printBtn);
+
+      header.appendChild(statusDiv);
+      header.appendChild(tableDiv);
+      header.appendChild(buttonsDiv);
+
+      const orderNumDiv = document.createElement('div');
+      orderNumDiv.className = 'text-xs text-gray-600 font-semibold';
+      orderNumDiv.textContent = `رقم الطلب: ${order.id}`;
+
+      const itemName = document.createElement('div');
+      itemName.className = 'text-sm font-semibold text-gray-900';
+      itemName.textContent = `اسم الخدمة: ${order.items.map(i => i.name).join('، ')}`;
+
+      const paymentBtn = document.createElement('button');
+      paymentBtn.className = order.paid
+        ? 'bg-green-600 hover:bg-green-700 text-white rounded px-3 py-1 text-xs font-semibold'
+        : 'bg-red-600 hover:bg-red-700 text-white rounded px-3 py-1 text-xs font-semibold';
+      paymentBtn.textContent = order.paid ? 'تم الدفع' : 'لم يتم الدفع';
+      paymentBtn.title = 'تبديل حالة الدفع';
+      paymentBtn.onclick = () => {
+        orders[index].paid = !orders[index].paid;
+        saveOrders();
+        renderOrders();
+        renderOldestOrder();
+        renderHistory();
+      };
+
+      const priceDiv = document.createElement('div');
+      priceDiv.className = 'text-xs font-semibold text-gray-700 text-left';
+      priceDiv.textContent = `السعر: $${order.price.toFixed(2)}`;
+
+      const datetimeDiv = document.createElement('div');
+      datetimeDiv.className = 'text-xs text-gray-500 text-left';
+      datetimeDiv.textContent = `الوقت: ${formatDateTime(order.datetime)}`;
+
+      card.appendChild(header);
+      card.appendChild(orderNumDiv);
+      card.appendChild(itemName);
+      card.appendChild(paymentBtn);
+      card.appendChild(priceDiv);
+      card.appendChild(datetimeDiv);
+
+      return card;
+    }
+
     function renderOldestOrder() {
       const order = getOldestOrder();
 
@@ -1669,125 +1688,8 @@
       orderNumberEl.textContent = `رقم الطلب: ${order.id}`;
     }
 
-    // Create order card for orders grid and history
-    function createOrderCard(order, index, isHistory = false) {
-      const card = document.createElement('div');
-      card.className = isHistory
-        ? 'border border-gray-300 rounded p-3 bg-gray-50'
-        : 'bg-white rounded-md p-3 flex flex-col space-y-2';
-
-      const header = document.createElement('div');
-      header.className = isHistory
-        ? 'flex justify-between items-center mb-2 text-sm font-semibold text-gray-700'
-        : 'flex justify-between items-center text-xs font-semibold text-gray-600';
-
-      const infoDiv = document.createElement('div');
-      infoDiv.textContent = isHistory
-        ? `رقم الطلب: ${order.id} - الترابيزة: ${order.table} - الحالة: ${order.status}`
-        : order.status;
-
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'flex space-x-2 rtl:space-x-reverse';
-
-      // Toggle paid button
-      const togglePaidBtn = document.createElement('button');
-      togglePaidBtn.className = order.paid
-        ? 'bg-green-600 hover:bg-green-700 text-white rounded px-2 py-1 text-xs font-semibold'
-        : 'bg-red-600 hover:bg-red-700 text-white rounded px-2 py-1 text-xs font-semibold';
-      togglePaidBtn.textContent = order.paid ? 'تم الدفع' : 'لم يتم الدفع';
-      togglePaidBtn.onclick = () => {
-        orders[index].paid = !orders[index].paid;
-        saveOrders();
-        renderOrders();
-        renderOldestOrder();
-        if (isHistory) renderHistory();
-      };
-
-      // Print button
-      const printBtn = document.createElement('button');
-      printBtn.setAttribute('aria-label', 'طباعة');
-      printBtn.className = 'bg-orange-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center';
-      printBtn.innerHTML = '<i class="fas fa-print"></i>';
-      printBtn.onclick = () => {
-        printOrder(order);
-      };
-
-      // Hide button (only for main orders grid)
-      const hideBtn = document.createElement('button');
-      hideBtn.setAttribute('aria-label', 'إخفاء الطلب');
-      hideBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center';
-      hideBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      hideBtn.onclick = () => {
-        hiddenIds.add(order.id);
-        renderOrders();
-        renderOldestOrder();
-        if (isHistory) renderHistory();
-      };
-
-      // Delete button
-      const deleteBtn = document.createElement('button');
-      deleteBtn.setAttribute('aria-label', 'حذف الطلب');
-      deleteBtn.className = 'bg-red-600 hover:bg-red-700 text-white rounded px-2 py-1 text-xs flex items-center justify-center';
-      deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-      deleteBtn.onclick = () => {
-        if (confirm(`هل أنت متأكد من حذف الطلب رقم ${order.id}؟`)) {
-          removeOrderById(order.id);
-          if (isHistory) renderHistory();
-        }
-      };
-
-      buttonsDiv.appendChild(togglePaidBtn);
-      buttonsDiv.appendChild(printBtn);
-      if (!isHistory) buttonsDiv.appendChild(hideBtn);
-      buttonsDiv.appendChild(deleteBtn);
-
-      header.appendChild(infoDiv);
-      header.appendChild(buttonsDiv);
-
-      card.appendChild(header);
-
-      if (isHistory) {
-        const itemsList = document.createElement('ul');
-        itemsList.className = 'text-sm text-gray-800 list-disc list-inside mb-1';
-        order.items.forEach(item => {
-          const li = document.createElement('li');
-          li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
-          itemsList.appendChild(li);
-        });
-        const priceDiv = document.createElement('div');
-        priceDiv.className = 'text-xs font-semibold text-gray-700 text-left';
-        priceDiv.textContent = `السعر الإجمالي: $${order.price.toFixed(2)}`;
-        const datetimeDiv = document.createElement('div');
-        datetimeDiv.className = 'text-xs text-gray-500 text-left';
-        datetimeDiv.textContent = `الوقت: ${formatDateTime(order.datetime)}`;
-        card.appendChild(itemsList);
-        card.appendChild(priceDiv);
-        card.appendChild(datetimeDiv);
-      } else {
-        const orderNumDiv = document.createElement('div');
-        orderNumDiv.className = 'text-xs text-gray-600 font-semibold';
-        orderNumDiv.textContent = `رقم الطلب: ${order.id}`;
-        const itemName = document.createElement('div');
-        itemName.className = 'text-sm font-semibold text-gray-900 truncate';
-        itemName.textContent = `اسم الخدمة: ${order.items.map(i => i.name).join('، ')}`;
-        const priceDiv = document.createElement('div');
-        priceDiv.className = 'text-xs font-semibold text-gray-700 text-left';
-        priceDiv.textContent = `السعر: $${order.price.toFixed(2)}`;
-        const datetimeDiv = document.createElement('div');
-        datetimeDiv.className = 'text-xs text-gray-500 text-left';
-        datetimeDiv.textContent = `الوقت: ${formatDateTime(order.datetime)}`;
-        card.appendChild(orderNumDiv);
-        card.appendChild(itemName);
-        card.appendChild(priceDiv);
-        card.appendChild(datetimeDiv);
-      }
-
-      return card;
-    }
-
-    // Render orders grid (excluding hidden)
     function renderOrders() {
-      sortOrders();
+      sortOrdersById();
       ordersGrid.innerHTML = '';
       orders.forEach((order, idx) => {
         if (!hiddenIds.has(order.id)) {
@@ -1797,16 +1699,6 @@
       saveOrders();
     }
 
-    // Remove order by id
-    function removeOrderById(id) {
-      orders = orders.filter(o => o.id !== id);
-      hiddenIds.delete(id);
-      renderOrders();
-      renderOldestOrder();
-      renderHistory();
-    }
-
-    // Hide oldest order
     function hideOldestOrder() {
       const oldest = getOldestOrder();
       if (!oldest) return;
@@ -1815,64 +1707,30 @@
       renderOldestOrder();
     }
 
-    // Print order receipt
-    function printOrder(order) {
-      let itemsHtml = '';
-      order.items.forEach(item => {
-        itemsHtml += `
-          <tr>
-            <td class="border px-3 py-1 text-right">${item.name}</td>
-            <td class="border px-3 py-1 text-center">${item.price.toFixed(2)} $</td>
-          </tr>
-        `;
-      });
-
-      const printContent = `
-        <div class="max-w-md mx-auto p-4 border border-gray-700 rounded shadow-md" dir="rtl" lang="ar" style="font-family: Arial, sans-serif;">
-          <h2 class="text-2xl font-bold mb-4 text-center">فاتورة الطلب</h2>
-          <div class="mb-2 text-right font-semibold">رقم الطلب: ${order.id}</div>
-          <div class="mb-2 text-right font-semibold">الترابيزة: ${order.table}</div>
-          <div class="mb-2 text-right font-semibold">الحالة: ${order.status}</div>
-          <div class="mb-2 text-right font-semibold">التاريخ والوقت: ${formatDateTime(order.datetime)}</div>
-          <table class="w-full border-collapse mb-4">
-            <thead>
-              <tr>
-                <th class="border px-3 py-1 bg-gray-200 text-right">اسم الخدمة</th>
-                <th class="border px-3 py-1 bg-gray-200 text-center">السعر</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-          </table>
-          <div class="text-right font-bold text-lg">الإجمالي: $${order.price.toFixed(2)}</div>
-          <div class="mt-6 text-center text-sm text-gray-600">شكراً لزيارتكم</div>
-        </div>
-      `;
-
-      printArea.innerHTML = printContent;
-      printArea.classList.remove('hidden');
-      window.print();
-      printArea.classList.add('hidden');
-      printArea.innerHTML = '';
+    function removeOrderById(id) {
+      orders = orders.filter(o => o.id !== id);
+      hiddenIds.delete(id);
+      renderOrders();
+      renderOldestOrder();
+      renderHistory();
     }
 
-    // Print oldest order
-    function printOldestOrder() {
-      const oldest = getOldestOrder();
-      if (!oldest) return;
-      printOrder(oldest);
+    function openAddOrderModal() {
+      document.getElementById('addOrderModal').classList.remove('hidden');
+      resetItemsContainer();
     }
 
-    // ================== ADD ORDER MODAL ===================
+    function closeAddOrderModal() {
+      document.getElementById('addOrderModal').classList.add('hidden');
+      document.getElementById('addOrderForm').reset();
+      resetItemsContainer();
+    }
 
-    // Reset items container with one empty row
     function resetItemsContainer() {
       itemsContainer.innerHTML = '';
       addItemRow();
     }
 
-    // Add one item row in add order modal
     function addItemRow() {
       const div = document.createElement('div');
       div.className = 'flex space-x-2 rtl:space-x-reverse items-center';
@@ -1923,7 +1781,6 @@
       itemsContainer.appendChild(div);
     }
 
-    // Remove item row from add order modal
     function removeItemRow(button) {
       if (itemsContainer.children.length > 1) {
         button.parentElement.remove();
@@ -1934,23 +1791,6 @@
       addItemRow();
     });
 
-    // Open add order modal
-    function openAddOrderModal() {
-      addOrderModal.classList.remove('hidden');
-      resetItemsContainer();
-      addOrderForm.reset();
-    }
-
-    // Close add order modal
-    function closeAddOrderModal() {
-      addOrderModal.classList.add('hidden');
-      addOrderForm.reset();
-      resetItemsContainer();
-    }
-
-    addTableBtn.addEventListener('click', openAddOrderModal);
-
-    // Submit new order form
     function submitNewOrder(event) {
       event.preventDefault();
       const table = document.getElementById('inputTable').value.trim();
@@ -2000,52 +1840,165 @@
       alert('تم إضافة الطلب بنجاح');
     }
 
-    addOrderForm.addEventListener('submit', submitNewOrder);
+    function printOrder(order) {
+      let itemsHtml = '';
+      order.items.forEach(item => {
+        itemsHtml += `
+          <tr>
+            <td class="border px-3 py-1 text-right">${item.name}</td>
+            <td class="border px-3 py-1 text-center">${item.price.toFixed(2)} $</td>
+          </tr>
+        `;
+      });
 
-    // ================== HISTORY MODAL ===================
+      const printContent = `
+        <div class="max-w-md mx-auto p-4 border border-gray-700 rounded shadow-md">
+          <h2 class="text-2xl font-bold mb-4 text-center">فاتورة الطلب</h2>
+          <div class="mb-2 text-right font-semibold">رقم الطلب: ${order.id}</div>
+          <div class="mb-2 text-right font-semibold">الترابيزة: ${order.table}</div>
+          <div class="mb-2 text-right font-semibold">الحالة: ${order.status}</div>
+          <div class="mb-2 text-right font-semibold">التاريخ والوقت: ${formatDateTime(order.datetime)}</div>
+          <table class="w-full border-collapse mb-4">
+            <thead>
+              <tr>
+                <th class="border px-3 py-1 bg-gray-200 text-right">اسم الخدمة</th>
+                <th class="border px-3 py-1 bg-gray-200 text-center">السعر</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+          <div class="text-right font-bold text-lg">الإجمالي: $${order.price.toFixed(2)}</div>
+          <div class="mt-6 text-center text-sm text-gray-600">شكراً لزيارتكم</div>
+        </div>
+      `;
 
-    // Open history modal
-    openHistoryBtn.addEventListener('click', () => {
+      printArea.innerHTML = printContent;
+      printArea.classList.remove('hidden');
+      window.print();
+      printArea.classList.add('hidden');
+      printArea.innerHTML = '';
+    }
+
+    function printOldestOrder() {
+      const oldest = getOldestOrder();
+      if (!oldest) return;
+      printOrder(oldest);
+    }
+
+    function openHistoryModal() {
       renderHistory();
       historyModal.classList.remove('hidden');
-    });
+    }
 
-    // Close history modal
     function closeHistoryModal() {
       historyModal.classList.add('hidden');
       historyContent.innerHTML = '';
     }
 
-    // Close button in history modal
-    historyModal.querySelector('button[aria-label="إغلاق سجل الطلبات"]').addEventListener('click', closeHistoryModal);
-
-    // Render history content
     function renderHistory() {
-      sortOrders();
+      sortOrdersById();
       if (orders.length === 0) {
         historyContent.innerHTML = `<p class="text-center text-gray-700 font-semibold">لا توجد طلبات حالياً</p>`;
         return;
       }
       historyContent.innerHTML = '';
       orders.forEach((order, idx) => {
-        const card = createOrderCard(order, idx, true);
+        const card = document.createElement('div');
+        card.className = 'border border-gray-300 rounded p-3 bg-gray-50';
+
+        const header = document.createElement('div');
+        header.className = 'flex justify-between items-center mb-2 text-sm font-semibold text-gray-700';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.textContent = `رقم الطلب: ${order.id} - الترابيزة: ${order.table} - الحالة: ${order.status}`;
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'flex space-x-2 rtl:space-x-reverse';
+
+        const togglePaidBtn = document.createElement('button');
+        togglePaidBtn.className = order.paid
+          ? 'bg-green-600 hover:bg-green-700 text-white rounded px-2 py-1 text-xs font-semibold'
+          : 'bg-red-600 hover:bg-red-700 text-white rounded px-2 py-1 text-xs font-semibold';
+        togglePaidBtn.textContent = order.paid ? 'تم الدفع' : 'لم يتم الدفع';
+        togglePaidBtn.title = 'تبديل حالة الدفع';
+        togglePaidBtn.onclick = () => {
+          orders[idx].paid = !orders[idx].paid;
+          saveOrders();
+          renderOrders();
+          renderOldestOrder();
+          renderHistory();
+        };
+
+        const printBtn = document.createElement('button');
+        printBtn.setAttribute('aria-label', 'طباعة');
+        printBtn.className = 'bg-orange-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center';
+        printBtn.innerHTML = '<i class="fas fa-print"></i>';
+        printBtn.title = 'طباعة الطلب';
+        printBtn.onclick = () => {
+          printOrder(order);
+        };
+
+        const hideBtn = document.createElement('button');
+        hideBtn.setAttribute('aria-label', 'إخفاء الطلب');
+        hideBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center';
+        hideBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        hideBtn.title = 'إخفاء الطلب من العرض العلوي وقائمة الطلبات';
+        hideBtn.onclick = () => {
+          hiddenIds.add(order.id);
+          renderOrders();
+          renderOldestOrder();
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.setAttribute('aria-label', 'حذف الطلب');
+        deleteBtn.className = 'bg-red-600 hover:bg-red-700 text-white rounded px-2 py-1 text-xs flex items-center justify-center';
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.title = 'حذف الطلب نهائياً';
+        deleteBtn.onclick = () => {
+          if (confirm(`هل أنت متأكد من حذف الطلب رقم ${order.id}؟`)) {
+            removeOrderById(order.id);
+            renderHistory();
+          }
+        };
+
+        buttonsDiv.appendChild(togglePaidBtn);
+        buttonsDiv.appendChild(printBtn);
+        buttonsDiv.appendChild(hideBtn);
+        buttonsDiv.appendChild(deleteBtn);
+
+        header.appendChild(infoDiv);
+        header.appendChild(buttonsDiv);
+
+        const itemsList = document.createElement('ul');
+        itemsList.className = 'text-sm text-gray-800 list-disc list-inside mb-1';
+        order.items.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+          itemsList.appendChild(li);
+        });
+
+        const priceDiv = document.createElement('div');
+        priceDiv.className = 'text-xs font-semibold text-gray-700 text-left';
+        priceDiv.textContent = `السعر الإجمالي: $${order.price.toFixed(2)}`;
+
+        const datetimeDiv = document.createElement('div');
+        datetimeDiv.className = 'text-xs text-gray-500 text-left';
+        datetimeDiv.textContent = `الوقت: ${formatDateTime(order.datetime)}`;
+
+        card.appendChild(header);
+        card.appendChild(itemsList);
+        card.appendChild(priceDiv);
+        card.appendChild(datetimeDiv);
+
         historyContent.appendChild(card);
       });
     }
 
-    // ================== PRINT AREA ===================
-
-    // Print area is used for printing order receipts
-
-    // ================== INITIALIZATION ===================
-
-    // Render orders and oldest order on load
+    // Initial render calls
     renderOrders();
     renderOldestOrder();
-
-    // Event listeners for oldest order buttons
-    hideOldestOrderBtn.addEventListener('click', hideOldestOrder);
-    printOldestOrderBtn.addEventListener('click', printOldestOrder);
 
   </script>
 </body>
